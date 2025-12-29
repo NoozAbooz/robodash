@@ -18,7 +18,7 @@ rd::Console::Console(std::string name) {
 	lv_obj_set_height(output, LV_SIZE_CONTENT);
 	lv_obj_add_style(output, &style_transp, 0);
 	lv_obj_add_style(output, &style_text_mono, 0);
-	lv_label_set_recolor(output, true);
+	// lv_label_set_recolor(output, true); // Function not available in this LVGL build
 	lv_label_set_long_mode(output, LV_LABEL_LONG_WRAP);
 }
 

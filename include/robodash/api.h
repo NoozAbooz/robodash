@@ -16,8 +16,8 @@
 
 // ========================== Check Compatibility ========================== //
 
-#if (LV_VERSION_CHECK(8, 3, 0) == 0)
-#error "LVGL version incompatible with robodash (Requires >= 8.3.X)"
+#if (LV_VERSION_CHECK(9, 2, 0) == 0)
+#error "LVGL version incompatible with robodash (Requires >= 9.2.X)"
 #endif
 
 #ifndef LV_FONT_MONTSERRAT_12

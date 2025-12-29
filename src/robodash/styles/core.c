@@ -19,7 +19,7 @@ void _init_style_core() {
 	lv_style_set_border_width(&style_core_button, 0);
 	lv_style_set_shadow_width(&style_core_button, 0);
 	lv_style_set_text_color(&style_core_button, color_text);
-	lv_style_set_img_recolor(&style_core_button, color_text);
+	lv_style_set_image_recolor(&style_core_button, color_text);
 
 	// Sidebar button pressed
 	lv_style_init(&style_core_button_pr);

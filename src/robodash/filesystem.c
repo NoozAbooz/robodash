@@ -77,7 +77,8 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t *drv, void *file_p, uint32_t *pos_p) {
 
 static void *fs_dir_open(lv_fs_drv_t *drv, const char *path) { return NULL; }
 
-static lv_fs_res_t fs_dir_read(lv_fs_drv_t *drv, void *rddir_p, char *fn) {
+static lv_fs_res_t fs_dir_read(lv_fs_drv_t *drv, void *rddir_p, char *fn, uint32_t fn_len) {
+	LV_UNUSED(fn_len);
 	return LV_FS_RES_NOT_IMP;
 }
 

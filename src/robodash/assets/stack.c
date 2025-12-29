@@ -48,12 +48,17 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_STACK uin
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
 };
 
-const lv_img_dsc_t stack = {
-  .header.cf = LV_IMG_CF_ALPHA_8BIT,
-  .header.always_zero = 0,
-  .header.reserved = 0,
-  .header.w = 24,
-  .header.h = 24,
-  .data_size = 576,
-  .data = stack_map,
+const lv_image_dsc_t stack = {
+    .header = {
+        .magic = LV_IMAGE_HEADER_MAGIC,
+        .cf = LV_COLOR_FORMAT_A8,
+        .flags = 0,
+        .w = 24,
+        .h = 24,
+        .stride = 24,
+        .reserved_2 = 0,
+    },
+    .data_size = sizeof(stack_map),
+    .data = stack_map,
+    .reserved = NULL,
 };

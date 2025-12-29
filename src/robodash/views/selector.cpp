@@ -77,11 +77,11 @@ void rd::Selector::sd_load() {
 	}
 
 	// Press button for selected auton
-	for (int id = 0; id < lv_obj_get_child_cnt(routine_list); id++) {
+	for (int id = 0; id < lv_obj_get_child_count(routine_list); id++) {
 		lv_obj_t *list_child = lv_obj_get_child(routine_list, id);
 		if (list_child == nullptr) continue;
-		if (strcmp(lv_list_get_btn_text(routine_list, list_child), saved_name) != 0) continue;
-		lv_event_send(list_child, LV_EVENT_CLICKED, selected_routine);
+		if (strcmp(lv_list_get_button_text(routine_list, list_child), saved_name) != 0) continue;
+		lv_obj_send_event(list_child, LV_EVENT_CLICKED, selected_routine);
 		break;
 	}
 }
@@ -89,7 +89,7 @@ void rd::Selector::sd_load() {
 // ============================== UI Callbacks ============================== //
 
 void rd::Selector::select_cb(lv_event_t *event) {
-	lv_obj_t *obj = lv_event_get_target(event);
+	lv_obj_t *obj = (lv_obj_t *)lv_event_get_target(event);
 	rd::Selector::routine_t *routine = (rd::Selector::routine_t *)lv_event_get_user_data(event);
 	rd::Selector *selector = (rd::Selector *)lv_obj_get_user_data(obj);
 	if (selector == nullptr) return;
@@ -100,9 +100,9 @@ void rd::Selector::select_cb(lv_event_t *event) {
 	selector->run_callbacks();
 
 	// Clear other checked buttons, make this auton's button the checked one
-	for (int id = 0; id < lv_obj_get_child_cnt(selector->routine_list); id++) {
+	for (int id = 0; id < lv_obj_get_child_count(selector->routine_list); id++) {
 		lv_obj_t *list_child = lv_obj_get_child(selector->routine_list, id);
-		lv_obj_clear_state(list_child, LV_STATE_CHECKED);
+		lv_obj_remove_state(list_child, LV_STATE_CHECKED);
 	}
 	lv_obj_add_state(obj, LV_STATE_CHECKED);
 
@@ -124,30 +124,30 @@ void rd::Selector::select_cb(lv_event_t *event) {
 		return;
 	}
 
-	lv_img_set_src(selector->selected_img, routine->img.c_str());
-	lv_obj_clear_flag(selector->selected_img, LV_OBJ_FLAG_HIDDEN);
+	lv_image_set_src(selector->selected_img, routine->img.c_str());
+	lv_obj_remove_flag(selector->selected_img, LV_OBJ_FLAG_HIDDEN);
 }
 
 void rd::Selector::pg_up_cb(lv_event_t *event) {
-	rd::Selector *selector = (rd::Selector *)lv_obj_get_user_data(lv_event_get_target(event));
+	rd::Selector *selector = (rd::Selector *)lv_obj_get_user_data((lv_obj_t *)lv_event_get_target(event));
 	lv_coord_t scroll_y = lv_obj_get_height(selector->routine_list);
 	lv_obj_scroll_by_bounded(selector->routine_list, 0, scroll_y, LV_ANIM_ON);
 }
 
 void rd::Selector::pg_down_cb(lv_event_t *event) {
-	rd::Selector *selector = (rd::Selector *)lv_obj_get_user_data(lv_event_get_target(event));
+	rd::Selector *selector = (rd::Selector *)lv_obj_get_user_data((lv_obj_t *)lv_event_get_target(event));
 	lv_coord_t scroll_y = lv_obj_get_height(selector->routine_list) * -1;
 	lv_obj_scroll_by_bounded(selector->routine_list, 0, scroll_y, LV_ANIM_ON);
 }
 
 void rd::Selector::up_cb(lv_event_t *event) {
-	rd::Selector *selector = (rd::Selector *)lv_obj_get_user_data(lv_event_get_target(event));
+	rd::Selector *selector = (rd::Selector *)lv_obj_get_user_data((lv_obj_t *)lv_event_get_target(event));
 	if (!selector) return;
 	selector->prev_auton();
 }
 
 void rd::Selector::down_cb(lv_event_t *event) {
-	rd::Selector *selector = (rd::Selector *)lv_obj_get_user_data(lv_event_get_target(event));
+	rd::Selector *selector = (rd::Selector *)lv_obj_get_user_data((lv_obj_t *)lv_event_get_target(event));
 	if (!selector) return;
 	selector->next_auton();
 }
@@ -186,7 +186,7 @@ rd::Selector::Selector(std::string name, std::vector<routine_t> new_routines) {
 	lv_obj_add_style(selected_label, &style_text_centered, 0);
 	lv_obj_add_style(selected_label, &style_text_medium, 0);
 
-	selected_img = lv_img_create(selected_cont);
+	selected_img = lv_image_create(selected_cont);
 	lv_obj_set_size(selected_img, 168, 168);
 	lv_obj_add_flag(selected_img, LV_OBJ_FLAG_HIDDEN);
 
@@ -195,7 +195,7 @@ rd::Selector::Selector(std::string name, std::vector<routine_t> new_routines) {
 	lv_obj_add_style(list_btns, &style_transp, 0);
 	lv_obj_set_size(list_btns, 32, 192);
 	lv_obj_align(list_btns, LV_ALIGN_TOP_LEFT, 236, 40);
-	lv_obj_clear_flag(list_btns, LV_OBJ_FLAG_SCROLLABLE);
+	lv_obj_remove_flag(list_btns, LV_OBJ_FLAG_SCROLLABLE);
 	lv_obj_set_layout(list_btns, LV_LAYOUT_FLEX);
 	lv_obj_set_flex_flow(list_btns, LV_FLEX_FLOW_COLUMN);
 	lv_obj_set_flex_align(
@@ -203,7 +203,7 @@ rd::Selector::Selector(std::string name, std::vector<routine_t> new_routines) {
 	);
 
 	// Up page button
-	lv_obj_t *pg_up_btn = lv_btn_create(list_btns);
+	lv_obj_t *pg_up_btn = lv_button_create(list_btns);
 	lv_obj_add_style(pg_up_btn, &style_transp, 0);
 	lv_obj_set_size(pg_up_btn, 32, 32);
 	lv_obj_add_event_cb(pg_up_btn, &pg_up_cb, LV_EVENT_CLICKED, NULL);
@@ -212,13 +212,13 @@ rd::Selector::Selector(std::string name, std::vector<routine_t> new_routines) {
 	lv_obj_set_style_text_opa(pg_up_btn, 128, LV_STATE_PRESSED);
 	lv_obj_set_flex_grow(pg_up_btn, 1);
 
-	lv_obj_t *pg_up_img = lv_img_create(pg_up_btn);
+	lv_obj_t *pg_up_img = lv_image_create(pg_up_btn);
 	lv_obj_align(pg_up_img, LV_ALIGN_CENTER, 0, 0);
-	lv_img_set_src(pg_up_img, LV_SYMBOL_UP "\n" LV_SYMBOL_UP);
+	lv_image_set_src(pg_up_img, LV_SYMBOL_UP "\n" LV_SYMBOL_UP);
 	lv_obj_set_style_text_line_space(pg_up_img, -10, LV_PART_MAIN);
 
 	// Up button
-	lv_obj_t *up_btn = lv_btn_create(list_btns);
+	lv_obj_t *up_btn = lv_button_create(list_btns);
 	lv_obj_add_style(up_btn, &style_transp, 0);
 	lv_obj_set_size(up_btn, 32, 32);
 	lv_obj_add_event_cb(up_btn, &up_cb, LV_EVENT_CLICKED, NULL);
@@ -226,12 +226,12 @@ rd::Selector::Selector(std::string name, std::vector<routine_t> new_routines) {
 	lv_obj_set_style_text_opa(up_btn, 128, LV_STATE_PRESSED);
 	lv_obj_set_flex_grow(up_btn, 1);
 
-	lv_obj_t *up_img = lv_img_create(up_btn);
+	lv_obj_t *up_img = lv_image_create(up_btn);
 	lv_obj_align(up_img, LV_ALIGN_CENTER, 0, 0);
-	lv_img_set_src(up_img, LV_SYMBOL_UP);
+	lv_image_set_src(up_img, LV_SYMBOL_UP);
 
 	// Down button
-	lv_obj_t *down_btn = lv_btn_create(list_btns);
+	lv_obj_t *down_btn = lv_button_create(list_btns);
 	lv_obj_add_style(down_btn, &style_transp, 0);
 	lv_obj_set_size(down_btn, 32, 32);
 	lv_obj_add_event_cb(down_btn, &down_cb, LV_EVENT_CLICKED, NULL);
@@ -239,12 +239,12 @@ rd::Selector::Selector(std::string name, std::vector<routine_t> new_routines) {
 	lv_obj_set_style_text_opa(down_btn, 128, LV_STATE_PRESSED);
 	lv_obj_set_flex_grow(down_btn, 1);
 
-	lv_obj_t *down_img = lv_img_create(down_btn);
+	lv_obj_t *down_img = lv_image_create(down_btn);
 	lv_obj_align(down_img, LV_ALIGN_CENTER, 0, 0);
-	lv_img_set_src(down_img, LV_SYMBOL_DOWN);
+	lv_image_set_src(down_img, LV_SYMBOL_DOWN);
 
 	// Down page button
-	lv_obj_t *pg_down_btn = lv_btn_create(list_btns);
+	lv_obj_t *pg_down_btn = lv_button_create(list_btns);
 	lv_obj_add_style(pg_down_btn, &style_transp, 0);
 	lv_obj_set_size(pg_down_btn, 32, 32);
 	lv_obj_add_event_cb(pg_down_btn, &pg_down_cb, LV_EVENT_CLICKED, NULL);
@@ -253,13 +253,13 @@ rd::Selector::Selector(std::string name, std::vector<routine_t> new_routines) {
 	lv_obj_set_style_text_opa(pg_down_btn, 128, LV_STATE_PRESSED);
 	lv_obj_set_flex_grow(pg_down_btn, 1);
 
-	lv_obj_t *pg_down_img = lv_img_create(pg_down_btn);
+	lv_obj_t *pg_down_img = lv_image_create(pg_down_btn);
 	lv_obj_align(pg_down_img, LV_ALIGN_CENTER, 0, 0);
-	lv_img_set_src(pg_down_img, LV_SYMBOL_DOWN "\n" LV_SYMBOL_DOWN);
+	lv_image_set_src(pg_down_img, LV_SYMBOL_DOWN "\n" LV_SYMBOL_DOWN);
 	lv_obj_set_style_text_line_space(pg_down_img, -10, LV_PART_MAIN);
 
 	// Nothing auton
-	lv_obj_t *nothing_btn = lv_list_add_btn(routine_list, NULL, "Nothing");
+	lv_obj_t *nothing_btn = lv_list_add_button(routine_list, NULL, "Nothing");
 	lv_obj_add_event_cb(nothing_btn, &select_cb, LV_EVENT_CLICKED, nullptr);
 	lv_obj_set_user_data(nothing_btn, this);
 	lv_obj_add_style(nothing_btn, &style_list_btn, 0);
@@ -291,7 +291,7 @@ rd::Selector::Selector(std::string name, std::vector<routine_t> new_routines) {
 	}
 
 	for (routine_t &routine : routines) {
-		lv_obj_t *new_btn = lv_list_add_btn(routine_list, NULL, routine.name.c_str());
+		lv_obj_t *new_btn = lv_list_add_button(routine_list, NULL, routine.name.c_str());
 
 		lv_obj_add_style(new_btn, &style_list_btn, 0);
 		lv_obj_add_style(new_btn, &style_list_btn_pr, LV_STATE_PRESSED);
@@ -309,14 +309,14 @@ rd::Selector::Selector(std::string name, std::vector<routine_t> new_routines) {
 			lv_obj_set_style_border_opa(color_chip, LV_OPA_0, 0);
 			lv_obj_set_style_radius(color_chip, 4, 0);
 			lv_obj_align(color_chip, LV_ALIGN_RIGHT_MID, -4, 8);
-			lv_obj_clear_flag(color_chip, LV_OBJ_FLAG_SCROLLABLE);
-			lv_obj_clear_flag(color_chip, LV_OBJ_FLAG_CLICKABLE);
+			lv_obj_remove_flag(color_chip, LV_OBJ_FLAG_SCROLLABLE);
+			lv_obj_remove_flag(color_chip, LV_OBJ_FLAG_CLICKABLE);
 		}
 	}
 
 	if (routines.size() > 3) {
-		lv_obj_clear_flag(pg_down_btn, LV_OBJ_FLAG_HIDDEN);
-		lv_obj_clear_flag(pg_up_btn, LV_OBJ_FLAG_HIDDEN);
+		lv_obj_remove_flag(pg_down_btn, LV_OBJ_FLAG_HIDDEN);
+		lv_obj_remove_flag(pg_up_btn, LV_OBJ_FLAG_HIDDEN);
 	}
 
 	if (pros::usd::is_installed()) sd_load();
@@ -325,18 +325,18 @@ rd::Selector::Selector(std::string name, std::vector<routine_t> new_routines) {
 // ============================= Other Methods ============================= //
 
 void rd::Selector::next_auton(bool wrap_around) {
-	for (int id = 0; id < lv_obj_get_child_cnt(routine_list); id++) {
+	for (int id = 0; id < lv_obj_get_child_count(routine_list); id++) {
 		lv_obj_t *list_child = lv_obj_get_child(routine_list, id);
 		if (!lv_obj_has_state(list_child, LV_STATE_CHECKED)) continue;
 
-		if (id == lv_obj_get_child_cnt(routine_list) - 1) {
+		if (id == lv_obj_get_child_count(routine_list) - 1) {
 			if (!wrap_around) return;
 			// nullptr because the "Nothing" button is always first, and doesnt have user data
-			lv_event_send(lv_obj_get_child(routine_list, 0), LV_EVENT_CLICKED, nullptr);
+			lv_obj_send_event(lv_obj_get_child(routine_list, 0), LV_EVENT_CLICKED, nullptr);
 		} else {
 			lv_obj_t *next_child = lv_obj_get_child(routine_list, id + 1);
 			if (next_child == nullptr) return;
-			lv_event_send(next_child, LV_EVENT_CLICKED, &routines[id + 1]);
+			lv_obj_send_event(next_child, LV_EVENT_CLICKED, &routines[id + 1]);
 		}
 
 		return;
@@ -345,7 +345,7 @@ void rd::Selector::next_auton(bool wrap_around) {
 
 void rd::Selector::prev_auton(bool wrap_around) {
 	lv_obj_t *prev_child = nullptr;
-	int child_count = lv_obj_get_child_cnt(routine_list);
+	int child_count = lv_obj_get_child_count(routine_list);
 	for (int id = 0; id < child_count; id++) {
 		lv_obj_t *list_child = lv_obj_get_child(routine_list, id);
 		if (!lv_obj_has_state(list_child, LV_STATE_CHECKED)) {
@@ -355,13 +355,13 @@ void rd::Selector::prev_auton(bool wrap_around) {
 
 		if (id == 0) {
 			if (!wrap_around) return;
-			lv_event_send(
+			lv_obj_send_event(
 			    lv_obj_get_child(routine_list, child_count - 1), LV_EVENT_CLICKED,
 			    &routines[child_count - 1]
 			);
 		} else {
 			if (prev_child == nullptr) return;
-			lv_event_send(prev_child, LV_EVENT_CLICKED, &routines[id - 1]);
+			lv_obj_send_event(prev_child, LV_EVENT_CLICKED, &routines[id - 1]);
 		}
 
 		return;
